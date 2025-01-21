@@ -26,7 +26,8 @@ if uploaded_file is not None:
         ir_columns.append("Organizations")
         ir_columns.append("Summary")
 
-        selected_columns = st.multiselect("Select columns to display", ir_columns, default=[
+        select_all = st.checkbox("Select all columns", value=False)
+        selected_columns = st.multiselect("Select columns to display", ir_columns, default=ir_columns if select_all else [
             "Summary", "Organizations", "Created", "IR Date & Time", "IR Current NIST Incident Response Stage"])
         
 
@@ -38,12 +39,12 @@ if uploaded_file is not None:
 
             filter_conditions = {}
 
-            # Apply filter for "IR Date & Time" column using date picker
+            # Apply filter for "Created" column using date picker
             if "Created" in selected_columns:
-                # Convert the "IR Date & Time" column to datetime
+                # Convert the "Created" column to datetime
                 df["Created"] = pd.to_datetime(df["Created"], errors='coerce')
 
-                # Create a date picker for the "IR Date & Time" column
+                # Create a date picker for the "Created" column
                 start_date = st.sidebar.date_input("Select start date", df["Created"].min())
                 end_date = st.sidebar.date_input("Select end date", df["Created"].max())
 
