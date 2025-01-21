@@ -2,10 +2,8 @@ import streamlit as st
 import pandas as pd
 from io import StringIO
 
-# Set the title of the app
 st.title("JSM IR CSV Filtering")
 
-# File uploader to upload CSV file
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file is not None:
@@ -22,7 +20,7 @@ if uploaded_file is not None:
         # Rename the columns in the DataFrame
         df.columns = columns
 
-        # Filter columns to only include those that start with "IR " and add "Organizations"
+        # Filter columns to only include those that start with "IR " and "Organizations" (more fields to be added later)
         ir_columns = [col for col in df.columns if col.startswith("IR ")]
         if "Organizations" in df.columns:
             ir_columns.append("Organizations")
@@ -34,10 +32,8 @@ if uploaded_file is not None:
         if selected_columns:
             filtered_df = df[selected_columns]
 
-            # Move the filter options to the sidebar
             st.sidebar.title("Filters")
 
-            # Dictionary to store selected filters
             filter_conditions = {}
 
             # Apply filter for "IR Date & Time" column using date picker
@@ -58,7 +54,7 @@ if uploaded_file is not None:
                                                            (df["IR Date & Time"] <= pd.to_datetime(end_date))
                     filtered_df = filtered_df[filter_conditions["IR Date & Time"]]
 
-            # Apply filter for "Organizations" column (categorical filter)
+            # Apply filter for "Organizations" column
             if "Organizations" in selected_columns:
                 unique_organizations = df["Organizations"].unique()
                 selected_organizations = st.sidebar.multiselect("Filter by Organizations (select multiple values)",
@@ -70,15 +66,8 @@ if uploaded_file is not None:
             # Show the filtered data only
             st.write("Filtered Data:", filtered_df)
 
-            # Optional: Create a basic chart if applicable (ensure consistent data types)
-            if len(selected_columns) == 1:
-                try:
-                    st.line_chart(filtered_df)
-                except Exception as e:
-                    st.error(f"Error in plotting chart: {str(e)}")
-
             # Create a button to download the filtered data as a CSV
-            csv_data = filtered_df.to_csv(index=False)  # Convert DataFrame to CSV format
+            csv_data = filtered_df.to_csv(index=False)
             st.download_button(
                 label="Download Filtered Data as CSV",
                 data=csv_data,
