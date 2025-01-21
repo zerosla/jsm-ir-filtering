@@ -22,11 +22,12 @@ if uploaded_file is not None:
 
         # Filter columns to only include those that start with "IR " and "Organizations" (more fields to be added later)
         ir_columns = [col for col in df.columns if col.startswith("IR ")]
-        if "Organizations" in df.columns:
-            ir_columns.append("Organizations")
+        ir_columns.append("Organizations")
+        ir_columns.append("Summary")
 
         # Allow the user to select which columns to display from the 'IR' columns and 'Organizations'
-        selected_columns = st.multiselect("Select columns to display", ir_columns, default=ir_columns)
+        selected_columns = st.multiselect("Select columns to display", ir_columns, default=[
+            "Summary", "Organizations", "IR Date & Time", "IR Current NIST Incident Response Stage"])
 
         # Filter the dataframe based on selected columns
         if selected_columns:
@@ -38,7 +39,7 @@ if uploaded_file is not None:
 
             # Apply filter for "IR Date & Time" column using date picker
             if "IR Date & Time" in selected_columns:
-                # Convert the "IR Date & Time" column to datetime (if not already)
+                # Convert the "IR Date & Time" column to datetime
                 df["IR Date & Time"] = pd.to_datetime(df["IR Date & Time"], errors='coerce')
 
                 # Create a date picker for the "IR Date & Time" column
@@ -66,15 +67,5 @@ if uploaded_file is not None:
             # Show the filtered data only
             st.write("Filtered Data:", filtered_df)
 
-            # Create a button to download the filtered data as a CSV
-            csv_data = filtered_df.to_csv(index=False)
-            st.download_button(
-                label="Download Filtered Data as CSV",
-                data=csv_data,
-                file_name="filtered_data.csv",
-                mime="text/csv"
-            )
-        else:
-            st.write("Please select at least one column to display.")
 else:
     st.write("Please upload a CSV file.")
