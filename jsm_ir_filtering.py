@@ -22,12 +22,13 @@ if uploaded_file is not None:
 
         # Filter columns to only include those that start with "IR " and "Organizations" (more fields to be added later)
         ir_columns = [col for col in df.columns if col.startswith("IR ")]
+        ir_columns.append("Created")
         ir_columns.append("Organizations")
         ir_columns.append("Summary")
 
-        # Allow the user to select which columns to display from the 'IR' columns and 'Organizations'
         selected_columns = st.multiselect("Select columns to display", ir_columns, default=[
-            "Summary", "Organizations", "IR Date & Time", "IR Current NIST Incident Response Stage"])
+            "Summary", "Organizations", "Created", "IR Date & Time", "IR Current NIST Incident Response Stage"])
+        
 
         # Filter the dataframe based on selected columns
         if selected_columns:
@@ -38,22 +39,22 @@ if uploaded_file is not None:
             filter_conditions = {}
 
             # Apply filter for "IR Date & Time" column using date picker
-            if "IR Date & Time" in selected_columns:
+            if "Created" in selected_columns:
                 # Convert the "IR Date & Time" column to datetime
-                df["IR Date & Time"] = pd.to_datetime(df["IR Date & Time"], errors='coerce')
+                df["Created"] = pd.to_datetime(df["Created"], errors='coerce')
 
                 # Create a date picker for the "IR Date & Time" column
-                start_date = st.sidebar.date_input("Select start date", df["IR Date & Time"].min())
-                end_date = st.sidebar.date_input("Select end date", df["IR Date & Time"].max())
+                start_date = st.sidebar.date_input("Select start date", df["Created"].min())
+                end_date = st.sidebar.date_input("Select end date", df["Created"].max())
 
                 # Ensure start date is earlier than end date
                 if start_date > end_date:
                     st.sidebar.error("Start date must be earlier than end date.")
                 else:
                     # Filter the dataframe based on the selected date range
-                    filter_conditions["IR Date & Time"] = (df["IR Date & Time"] >= pd.to_datetime(start_date)) & \
-                                                           (df["IR Date & Time"] <= pd.to_datetime(end_date))
-                    filtered_df = filtered_df[filter_conditions["IR Date & Time"]]
+                    filter_conditions["Created"] = (df["Created"] >= pd.to_datetime(start_date)) & \
+                                                           (df["Created"] <= pd.to_datetime(end_date))
+                    filtered_df = filtered_df[filter_conditions["Created"]]
 
             # Apply filter for "Organizations" column
             if "Organizations" in selected_columns:
@@ -66,6 +67,7 @@ if uploaded_file is not None:
 
             # Show the filtered data only
             st.write("Filtered Data:", filtered_df)
+            st.write(f"{len(filtered_df)} incidents shown.")
 
 else:
     st.write("Please upload a CSV file.")
